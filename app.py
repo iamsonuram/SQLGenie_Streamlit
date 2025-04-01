@@ -2,6 +2,7 @@ import streamlit as st
 import sqlite3
 import pandas as pd
 import os
+import subprocess
 from mistral_api import generate_sql, call_mistral_for_visualization
 
 # Initialize session state for persistent data
@@ -95,10 +96,20 @@ if st.button("Generate Visualization"):
             for file in os.listdir("static/plots"):
                 os.remove(os.path.join("static/plots", file))
             # Generate new plots
-            call_mistral_for_visualization("generated_data.csv")
-            os.system("python plot.py")
-            st.session_state["plot_index"] = 0  # Reset to first plot
-            st.success("Visualizations generated!")
+            generated_code = call_mistral_for_visualization("generated_data.csv")
+            st.write("Generated Plot Script:", generated_code)  # Debug output
+            result = subprocess.run(
+                ["python", "plot.py"],
+                capture_output=True,
+                text=True
+            )
+            if result.returncode != 0:
+                st.error(f"Plot script failed: {result.stderr}")
+            else:
+                st.success("Visualizations generated!")
+                plots = [f for f in os.listdir("static/plots") if f.endswith(".png")]
+                if not plots:
+                    st.warning("No plots found in static/plots/ after generation.")
         except Exception as e:
             st.error(f"Visualization Generation Failed: {str(e)}")
 
