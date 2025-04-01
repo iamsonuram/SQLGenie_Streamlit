@@ -55,6 +55,7 @@ def generate_sql(user_input, api_key, db_path):
 
     print(f"🟢 Sending request to Mistral with schema:\n{table_schema}")
     print(f"🟢 User Query: {user_input}")
+    print(f"🟢 Mistral Response: {response.status_code} - {response.text}")
 
 
     if response.status_code == 200:

@@ -97,7 +97,6 @@ if st.button("Generate Visualization"):
                 os.remove(os.path.join("static/plots", file))
             # Generate new plots
             generated_code = call_mistral_for_visualization("generated_data.csv")
-            st.write("Generated Plot Script:", generated_code)  # Debug output
             result = subprocess.run(
                 ["python", "plot.py"],
                 capture_output=True,
