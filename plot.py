@@ -10,14 +10,14 @@ for filename in os.listdir("static/plots"):
 
 df = pd.read_csv("generated_data.csv")
 
-plt.figure(figsize=(8, 5))
-plt.bar(df["FirstName"], df["Salary"], color="skyblue")
+plt.figure(figsize=(10, 6))
+sns.barplot(x="FirstName", y="Salary", data=df)
 plt.xlabel("First Name")
 plt.ylabel("Salary")
-plt.title("Salary by Employee")
+plt.title("Salary by First Name")
 plt.savefig("static/plots/plot_1.png")
 
-plt.figure(figsize=(8, 5))
+plt.figure(figsize=(10, 6))
 sns.boxplot(x="LastName", y="Salary", data=df)
 plt.xlabel("Last Name")
 plt.ylabel("Salary")

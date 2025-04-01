@@ -129,12 +129,12 @@ if plots:
     # Next Button
     col1, col2 = st.columns([1, 1])
     with col1:
-        if st.button("Next Plot") and st.session_state["plot_index"] < len(plots) - 1:
-            st.session_state["plot_index"] += 1
-            st.rerun()  # Rerun to update the displayed plot
-    with col2:
         if st.button("Previous Plot") and st.session_state["plot_index"] > 0:
             st.session_state["plot_index"] -= 1
+            st.rerun()  # Rerun to update the displayed plot
+    with col2:
+        if st.button("Next Plot") and st.session_state["plot_index"] < len(plots) - 1:
+            st.session_state["plot_index"] += 1
             st.rerun()  # Rerun to update the displayed plot
 
 # Clear Button
