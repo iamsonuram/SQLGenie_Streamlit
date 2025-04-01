@@ -3,7 +3,6 @@ matplotlib.use('Agg')
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 for filename in os.listdir("static/plots"):
     os.remove(os.path.join("static/plots", filename))
@@ -11,22 +10,14 @@ for filename in os.listdir("static/plots"):
 df = pd.read_csv("generated_data.csv")
 
 plt.figure(figsize=(8, 5))
-plt.scatter(df["Salary"], df["HireDate"], marker="o", color="orange")
-plt.xlabel("Salary")
-plt.ylabel("Hire Date")
-plt.title("Salary vs Hire Date")
+plt.pie(df["total\_salary\_expenditure"], labels=df["DepartmentName"], autopct="%1.1f%%")
+plt.axis("equal")
+plt.title("Total Salary Expenditure by Department")
 plt.savefig("static/plots/plot_1.png")
 
 plt.figure(figsize=(8, 5))
-sns.countplot(x="DepartmentID", data=df)
-plt.xlabel("Department ID")
-plt.ylabel("Number of Employees")
-plt.title("Number of Employees by Department")
+plt.bar(df["DepartmentName"], df["total\_salary\_expenditure"], color="orange")
+plt.xlabel("Department")
+plt.ylabel("Total Salary Expenditure")
+plt.title("Total Salary Expenditure by Department")
 plt.savefig("static/plots/plot_2.png")
-
-plt.figure(figsize=(8, 5))
-sns.barplot(x="LastName", y="Salary", data=df)
-plt.xlabel("Last Name")
-plt.ylabel("Salary")
-plt.title("Salary by Last Name")
-plt.savefig("static/plots/plot_3.png")
