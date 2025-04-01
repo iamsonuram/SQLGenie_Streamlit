@@ -10,14 +10,8 @@ for filename in os.listdir("static/plots"):
 df = pd.read_csv("generated_data.csv")
 
 plt.figure(figsize=(8, 5))
-plt.pie(df["total\_salary\_expenditure"], labels=df["DepartmentName"], autopct="%1.1f%%")
-plt.axis("equal")
-plt.title("Total Salary Expenditure by Department")
-plt.savefig("static/plots/plot_1.png")
-
-plt.figure(figsize=(8, 5))
-plt.bar(df["DepartmentName"], df["total\_salary\_expenditure"], color="orange")
+plt.bar(df["DepartmentName"], df["total_salary"], color="skyblue")
 plt.xlabel("Department")
-plt.ylabel("Total Salary Expenditure")
-plt.title("Total Salary Expenditure by Department")
-plt.savefig("static/plots/plot_2.png")
+plt.ylabel("Total Salary")
+plt.title("Total Salary by Department")
+plt.savefig("static/plots/plot_1.png")

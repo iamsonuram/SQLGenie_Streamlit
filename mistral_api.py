@@ -83,12 +83,13 @@ def call_mistral_for_visualization(CSV_OUTPUT):
     ```python
     import matplotlib
     matplotlib.use('Agg')
+    DO NOT insert backslashes (\) before underscores in variable names or file paths.
     IMPORTANT:
     1. Return ONLY the Python code in plain text.
     2. Do NOT include explanations, comments, or markdown formatting.
     3. Ensure the script is immediately executable and works in a server-side context.
     4. Follow the exact import order: set matplotlib.use('Agg') first, then import other libraries.
-    5. NEVER insert backslashes (\) before underscores in variable names or file paths. Example: Use pd.read_csv("generated_data.csv"), not pd.read\_csv("generated\_data.csv").
+    5. DO NOT insert backslashes (\) before underscores in variable names or file paths. Example: Use pd.read_csv("generated_data.csv"), not pd.read\_csv("generated\_data.csv").
     6. Resolve all the import issues.
         
     CSV Data:
