@@ -39,10 +39,13 @@ SQLGenie is an intuitive web application that transforms natural language querie
 
 2. **Install Dependencies**: Create a virtual environment and install required packages:
 
-  `python -m venv venv`
-  `source venv/bin/activate`  # On Windows: `venv\Scripts\activate`
-  `pip install -r requirements.txt`
-  Prepare Directory Structure: Ensure the following directories exist (they’ll be created automatically on first run):
+     ```bash
+     python -m venv venv
+     source venv/bin/activate  # On Windows: venv\Scripts\activate
+     pip install -r requirements.txt
+      ```
+  
+4. **Prepare Directory Structure**: Ensure the following directories exist (they’ll be created automatically on first run):
   db/ (for uploaded SQLite databases)
   static/plots/ (for generated plot images)
   
