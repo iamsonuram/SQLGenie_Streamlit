@@ -5,19 +5,19 @@ import os
 import requests
 import json
 import matplotlib
-matplotlib.use('Agg')  # Set non-interactive backend for Matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import re
 
 # Initialize session state for persistent data
-if "api_key" not in st.session_state:
-    st.session_state["api_key"] = ""
 if "sql_query" not in st.session_state:
     st.session_state["sql_query"] = ""
 if "results_df" not in st.session_state:
     st.session_state["results_df"] = None
 if "plot_index" not in st.session_state:
     st.session_state["plot_index"] = 0
+if "db_tables" not in st.session_state:
+    st.session_state["db_tables"] = []
 
 # Ensure directories exist
 os.makedirs("db", exist_ok=True)
@@ -26,10 +26,11 @@ os.makedirs("static/plots", exist_ok=True)
 # Mistral API Configuration
 MISTRAL_URL = "https://api.mistral.ai/v1/chat/completions"
 MISTRAL_AGENT_URL = "https://api.mistral.ai/v1/agents/completions"
+MISTRAL_API_KEY = "jDcCdZ0dkkTKEjAfVIoLWbRcmZ4ktwBs"  
 MISTRAL_AGENT_ID = "ag:79ec7e4f:20250328:untitled-agent:36859aa3"
 
 def load_database_schema(db_path):
-    """Loads the schema of the uploaded SQLite database."""
+    """Loads the schema of the uploaded SQLite database and returns schema and table names."""
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
@@ -44,9 +45,9 @@ def load_database_schema(db_path):
         schema += ", ".join([f"{col[1].lower()} ({col[2]})" for col in columns]) + "\n\n"
 
     conn.close()
-    return schema.strip()
+    return schema.strip(), [table[0] for table in tables]
 
-def generate_sql(user_input, api_key, db_path):
+def generate_sql(user_input, db_path):
     """Converts a natural language query to SQL using Mistral API."""
     table_schema = load_database_schema(db_path)
 
@@ -59,7 +60,7 @@ def generate_sql(user_input, api_key, db_path):
     )
 
     headers = {
-        "Authorization": f"Bearer {api_key}",
+        "Authorization": f"Bearer {MISTRAL_API_KEY}",
         "Content-Type": "application/json"
     }
 
@@ -102,7 +103,7 @@ def extract_python_code(response_text):
     code = response_text[code_start_pos:code_end_pos].strip()
     return code
 
-def call_mistral_for_visualization(csv_file, api_key):
+def call_mistral_for_visualization(csv_file):
     """Uses Mistral to generate a visualization script based on CSV data."""
     with open(csv_file, "r") as f:
         csv_data = f.read()
@@ -127,7 +128,7 @@ def call_mistral_for_visualization(csv_file, api_key):
     """
 
     headers = {
-        "Authorization": f"Bearer {api_key}",
+        "Authorization": f"Bearer {MISTRAL_API_KEY}",
         "Content-Type": "application/json"
     }
 
@@ -157,19 +158,13 @@ st.title("SQL Genie")
 # Instructions
 st.markdown("""
 ### How to Use:
-1. Enter your Mistral API key and upload a SQLite database.
-2. Type a natural language query and click "Generate SQL".
-3. Click "Execute Query" to see the results.
-4. Click "Generate Visualization" to create plots.
-5. Use the dropdown or "Next"/"Previous" buttons to view all generated plots.
-6. Click "Clear" to reset outputs (API key and database remain loaded).
-""")
-
-# API Key Input
-api_key = st.text_input("Mistral API Key", type="password", value=st.session_state["api_key"])
-if api_key:
-    st.session_state["api_key"] = api_key
-    st.success("API Key loaded!")
+1. Upload a SQLite database to start.
+2. View the tables present in the uploaded database below.
+3. Type a natural language query and click "Generate SQL".
+4. Click "Execute Query" to see the results.
+5. Click "Generate Visualization" to create plots.
+6. Use the dropdown or "Next"/"Previous" buttons to view all generated plots.
+7. Click "Clear" to reset outputs (database remains loaded). """)
 
 # Database Upload
 db_file = st.file_uploader("Upload SQLite Database", type=["db"])
@@ -177,18 +172,23 @@ if db_file:
     with open("db/database.db", "wb") as f:
         f.write(db_file.read())
     st.success("Database uploaded successfully!")
+    # Load and display tables
+    schema, table_names = load_database_schema("db/database.db")
+    st.session_state["db_tables"] = table_names
+    st.subheader("Tables in Uploaded Database:")
+    # Display tables in a tabular format
+    df_tables = pd.DataFrame(table_names, columns=["Table Name"])
+    st.table(df_tables)
 
 # Natural Language Query Input
 user_query = st.text_area("Enter your natural language query")
 
 # Generate SQL Button
 if st.button("Generate SQL"):
-    if not st.session_state["api_key"]:
-        st.error("Please enter a Mistral API key first!")
-    elif not os.path.exists("db/database.db"):
+    if not os.path.exists("db/database.db"):
         st.error("Please upload a database first!")
     else:
-        sql_query = generate_sql(user_query, st.session_state["api_key"], "db/database.db")
+        sql_query = generate_sql(user_query, "db/database.db")
         if sql_query:
             st.session_state["sql_query"] = sql_query
         else:
@@ -229,7 +229,7 @@ if st.button("Generate Visualization"):
                 os.remove(os.path.join("static/plots", file))
             # Generate visualization code
             try:
-                generated_code = call_mistral_for_visualization("generated_data.csv", st.session_state["api_key"])
+                generated_code = call_mistral_for_visualization("generated_data.csv")
                 # Execute the generated code directly
                 exec_globals = {
                     "matplotlib": matplotlib,
@@ -293,4 +293,3 @@ if st.button("Clear"):
     for file in os.listdir("static/plots"):
         os.remove(os.path.join("static/plots", file))
     st.success("Cleared all outputs!")
-
