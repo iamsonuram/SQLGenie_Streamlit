@@ -48,13 +48,13 @@ def load_database_schema(db_path):
     return schema.strip(), [table[0] for table in tables]
 
 def generate_sql(user_input, db_path):
-    """Converts a natural language query to SQL using Mistral API."""
-    table_schema = load_database_schema(db_path)
+    """Converts a natural language query to SQL using Mistral API, handling only SELECT queries."""
+    table_schema, _ = load_database_schema(db_path)
 
     prompt = (
-        f"Based on the following database schema, generate only a complete and executable SQL query without any explanation. "
+        f"Based on the following database schema, generate only a complete and executable SQL SELECT query without any explanation. "
         f"Ensure the query includes the FROM clause and necessary conditions. "
-        f"If the request is unrelated to the schema, return 'ERROR: No relevant table found'.\n"
+        f"If the request is unrelated to the schema or cannot be translated to a SELECT query, return 'ERROR: No relevant table found'.\n"
         f"Schema:\n{table_schema}\n"
         f"User request: '{user_input}'"
     )
@@ -65,7 +65,7 @@ def generate_sql(user_input, db_path):
     }
 
     payload = {
-        "model": "codestral-2501",
+        "model": "mistral-medium",
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.3
     }
@@ -77,11 +77,20 @@ def generate_sql(user_input, db_path):
 
     if response.status_code == 200:
         result = response.json()["choices"][0]["message"]["content"].strip()
-        if "ERROR: No relevant table found" in result:
+        # Extract SQL query from potential code block
+        sql_match = re.search(r'```sql\n(.*?)\n```', result, re.DOTALL)
+        if sql_match:
+            sql_query = sql_match.group(1).strip()
+        else:
+            sql_query = result.strip()
+
+        print(f"🟢 Extracted SQL Query: {sql_query}")  # Debug log
+
+        if sql_query == "ERROR: No relevant table found":
             return None
-        if result.lower().startswith("select"):
-            return result
-        return None
+        if sql_query.lower().startswith("select"):
+            return sql_query
+        return None  # Return None for non-SELECT queries
     else:
         return f"Error: {response.status_code}, {response.text}"
 
