@@ -28,14 +28,13 @@ SQLGenie is an intuitive web application that transforms natural language querie
 
 ### Prerequisites
 - Python 3.8 or higher
-- A Mistral API key (sign up at [Mistral AI](https://mistral.ai/) to get one)
-- Git (optional, for cloning)
+- Git (for cloning)
 
 ### Steps
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/your-username/SQLGenie.git
-   cd SQLGenie
+   git clone https://github.com/iamsonuram/SQLGenie_streamlit
+   cd SQLGenie_Streamlit
 
 2. **Install Dependencies**: Create a virtual environment and install required packages:
 
