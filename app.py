@@ -65,7 +65,7 @@ def generate_sql(user_input, db_path):
     }
 
     payload = {
-        "model": "mistral-medium",
+        "model": "codestral-2501",
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.3
     }
