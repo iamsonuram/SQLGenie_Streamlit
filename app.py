@@ -26,8 +26,8 @@ os.makedirs("static/plots", exist_ok=True)
 # Mistral API Configuration
 MISTRAL_URL = "https://api.mistral.ai/v1/chat/completions"
 MISTRAL_AGENT_URL = "https://api.mistral.ai/v1/agents/completions"
-MISTRAL_API_KEY = st.secrets["MISTRAL_API_KEY"]
-MISTRAL_AGENT_ID = st.secrets["MISTRAL_AGENT_ID"]
+MISTRAL_API_KEY = "jDcCdZ0dkkTKEjAfVIoLWbRcmZ4ktwBs"
+MISTRAL_AGENT_ID = "ag:79ec7e4f:20250328:untitled-agent:36859aa3"
 
 def load_database_schema(db_path):
     """Loads the schema of the uploaded SQLite database and returns schema and table names."""
